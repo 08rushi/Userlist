@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export const Signup = () => {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -13,7 +16,7 @@ export const Signup = () => {
     return re.test(email);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!validateEmail(email)) {
@@ -32,8 +35,37 @@ export const Signup = () => {
     }
 
     setError('');
-    
-    navigate('/home');
+    try {
+      const response = await fetch('https://mmfinfotech.co/machine_test/api/userRegister', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+          first_name: firstName, 
+          last_name: lastName, 
+          phone_no: phoneNumber, 
+          email, 
+          password, 
+          confirm_password: password, 
+          country_code: "+91" 
+        })
+      });
+
+      const data = await response.json();
+      console.log('Register successful:', data);
+      
+      if (data.status) {
+        localStorage.setItem("authtoken", data.data.token);
+        navigate('/home');
+      } else {
+        setError(data.message);
+      }
+
+    } catch (error) {
+      console.error('There was a problem with the fetch operation:', error);
+      setError('Registration failed. Please try again.');
+    }
   };
 
   return (
@@ -41,6 +73,39 @@ export const Signup = () => {
       <div className="bg-white p-8 rounded-lg shadow-lg w-80">
         <h2 className="text-2xl font-bold mb-6 text-center text-black">Sign Up</h2>
         <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label className="block text-black mb-2" htmlFor="firstName">First Name</label>
+            <input
+              type="text"
+              id="firstName"
+              className="w-full px-3 py-2 border rounded"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-black mb-2" htmlFor="lastName">Last Name</label>
+            <input
+              type="text"
+              id="lastName"
+              className="w-full px-3 py-2 border rounded"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-black mb-2" htmlFor="phoneNumber">Phone Number</label>
+            <input
+              type="tel"
+              id="phoneNumber"
+              className="w-full px-3 py-2 border rounded"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              required
+            />
+          </div>
           <div className="mb-4">
             <label className="block text-black mb-2" htmlFor="email">Email</label>
             <input
