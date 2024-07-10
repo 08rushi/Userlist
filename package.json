@@ -1,6 +1,6 @@
 {
-  "name": "userlist",
-  "homepage": "https://08rushi.github.io/userlist",
+  "name": "task",
+  "homepage": "https://08rushi.github.io/task",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
